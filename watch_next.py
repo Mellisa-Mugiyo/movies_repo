@@ -1,46 +1,41 @@
-# from __future__ import unicode_literals
-# import spacy
-
-# nlp = spacy.load("en_core_web_md")
-
-# myfile = open("movies.txt").read()
-# NlpRead = nlp(myfile)
-
-# sentence_to_compare = "Will he save their world or destroy it? When the Hulk becomes too dangerous for the Earth, the Illuminati trick Hulk into a shuttle and launch him into space to a planet where the Hulk can live in peace. Unfortunately, Hulk land on the planet Sakaar where he is sold into slavery and trained as a gladiator"
-
-# model_sentences = nlp(sentence_to_compare)
-
-# for sentence in myfile:
-#     similarity = nlp(sentence).similarity(model_sentences)
-#     print(sentence + "-" + str(similarity))
-
-
 
 import spacy
-import numpy as np
 
-nlp = spacy.load("en_core_web_md")
-tokens = nlp(u'Hulk Superman Batman dragon elf dance musical handsome romance war soldier')
-
-for token in tokens:
-    print(token.text, token.has_vector, token.vector_norm, token.is_oov)
-
-labels = [a.text for a in tokens]
-print(labels)
-
-M = np.zeros((len(tokens), len(tokens)))
-for idx, token1 in enumerate(tokens):
-    for idy, token2 in enumerate(tokens):
-        M[idx, idy] = token1.similarity(token2)
+nlp = spacy.load('en_core_web_md')
 
 
+def movie(description):
+    
+    movies = open("movies.txt", "r")
+    split_list = []#split the movie and store the title in a list
 
-doc = nlp("Will he save their world or destroy it? When the Hulk becomes too dangerous for the Earth, the Illuminati trick Hulk into a shuttle and launch him into space to a planet where the Hulk can live in peace. Unfortunately, Hulk land on the planet Sakaar where he is sold into slavery and trained as a gladiator")
+    
+    for i in movies:
+        split_list.append(i.split(':'))
 
-properNouns = [token.text for token in doc if token.pos_ =='PROPN']
-commonNouns = [token.text for token in doc if token.pos_ =='NOUN']
-print(properNouns)
-# ['Hulk', 'Earth', 'Illuminati', 'Hulk', 'Hulk', 'Hulk', 'Sakaar']
-print(commonNouns)
-# ['world', 'shuttle', 'space', 'planet', 'peace', 'land', 'planet', 'slavery',
 
+    count = len(split_list)
+    list_of_simmilarities = []
+
+    model_sentence = nlp(description)
+
+    for i in range(0, count):
+        list_of_simmilarities.append(nlp(split_list[i][1]).similarity(model_sentence))
+
+    #max_similarity = max(split_list)
+
+    max_similarity = max(list_of_simmilarities)
+    max_similarity_index = list_of_simmilarities.index(max_similarity) #getting the index of the most similarity value
+
+    
+    return split_list[max_similarity_index][0] # return the title of the most similar movie
+
+# The movie description to be compared with
+hulk_description = """Will he save
+their world or destroy it? When the Hulk becomes too dangerous for the
+Earth, the Illuminati trick Hulk into a shuttle and launch him into space to a
+planet where the Hulk can live in peace. Unfortunately, Hulk land on the
+planet Sakaar where he is sold into slavery and trained as a gladiator."""
+
+
+print("The most simillar movie to watch next from movies.txt is : " + movie(hulk_description))
